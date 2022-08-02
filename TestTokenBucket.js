@@ -1,4 +1,4 @@
-class TestTokenBucket {
+export class TestTokenBucket {
 
     constructor(capacity) {
         this.totalCapacity = capacity;

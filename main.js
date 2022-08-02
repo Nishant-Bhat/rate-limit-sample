@@ -2,7 +2,7 @@
 // https://www.krakend.io/images/documentation/krakend-token-bucket.png
 
 const app = express.app();
-
+import {TestTokenBucket} from './TestTokenBucket.js';
 
 // Closure
 // Factory pattern
