@@ -8,26 +8,25 @@ import {TestTokenBucket} from './TestTokenBucket.js';
 // Factory pattern
 // Class
 
+const bucket = new TestTokenBucket();
 
-function rateLimiter(totalNumberOfRequest) {
-    const bucket = new TestTokenBucket(totalNumberOfRequest);
-    return function limitRequestsMiddleware(req, res, next) {
-        if (bucket.takeTokenFromBucket()) {
-            next();
-        } else {
-            res.status(500).send('Rate limit reached');
-        }
-    }
-}
 
 // 5req/m
-app.post('/api/login', (req, res) => {
-    rateLimiter(5)
+app.post('/api/login', (req, res,next) => {
+    if(bucket.registerRequest(req.route.path,5)){
+     next()
+    }else{
+        res.status(500).send('Rate limit reached'); 
+    }
 
 });
 
 // 10req/m
 app.post('/api/signup', (req, res) => {
-    rateLimiter(10)
+    if(bucket.registerRequest(req.route.path,10)){
+        next()
+       }else{
+           res.status(500).send('Rate limit reached'); 
+       }
 });
 
