@@ -1,23 +1,35 @@
 export class TestTokenBucket {
+     globalCounter={};
 
-    constructor(capacity) {
-        this.totalCapacity = capacity;
-        this.totalNumberOfTokens = capacity;
-        setInterval(() => this.addTotalToken(), 60 * 1000 );
+     
+    registerRequest=(url,capacity)=>{
+if(globalCounter[url]?.capacity!=capacity){
+    globalCounter[url]={
+        capacity,count:0,lastRequestedTime:new Date()
+    }
+}
+        return this.rateLimitUrl(url);
+
     }
 
-    addTotalToken() {
-        if (this.totalNumberOfTokens < this.totalCapacity) {
-            this.totalNumberOfTokens += 1;
+    rateLimitUrl=(url)=>{
+        if(globalCounter[url].count>globalCounter[url].capacity){
+            const dateDiff=(new Date().getTime()-globalCounter[url].lastRequestedTime.getTime())/1000;
+            if(dateDiff<60){
+                return false;
+            }else{
+                globalCounter[url]={...globalCounter[url],
+                    count:0,lastRequestedTime:new Date()
+                   }
+            }
         }
-    }
-
-    takeTokenFromBucket() {
-        if (this.totalNumberOfTokens > 0) {
-            this.totalNumberOfTokens -= 1;
-            return true;
+        globalCounter[url]={...globalCounter[url],
+         count:(globalCounter[url]?.count||0)+1,lastRequestedTime:new Date()
         }
+        return true;
+       
 
-        return false;
+
     }
+
 }
